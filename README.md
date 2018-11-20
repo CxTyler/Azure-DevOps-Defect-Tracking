@@ -1,7 +1,7 @@
 ## Azure-DevOps-Defect-Tracking
 #Python script for opening/closing issues with in Azure DevOps (formally VSTS). 
 
-#A script to interact with a Checkmarx Static Scan report (XML) and Azure DevOps Work Items. This script 
+##A script to interact with a Checkmarx Static Scan report (XML) and Azure DevOps Work Items. This script 
 
 #Running the python script on Windows
 Install Python 3.6 or some newer version
