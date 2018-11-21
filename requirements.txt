@@ -1,0 +1,4 @@
+requests==2.19.1
+keyring==13.2.1
+json
+logging
