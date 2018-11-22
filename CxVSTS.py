@@ -15,6 +15,7 @@ username = "sean"
 vsts_token = keyring.get_password(serviceName, username)
 vsts_organization = "smccheckmarx"
 project_name = "WebGoat.Net"
+ignoreFP = True
 
 
 ### Define Issue class for assistance with creating/adding issues to an array. Pretty print method for debugging ###
@@ -29,6 +30,7 @@ class Issue:
 		self.wid = wid
 		self.vulnerability = vulnerability
 		self.assignedToUser = assignedToUser
+
 	def __eq__(self, other):
 		return (self.similarityID + self.pathNodeID == other.similarityID + other.pathNodeID)
 	def __str__(self):
@@ -62,16 +64,17 @@ def parse_xml(xmlFilePath):
 	for query in root:
 		vulnerability = query.attrib["name"]
 		for result in query:
-			if queryResultCount < MAX_CX_RESULTS:
-				#Idenfity "New" issues
-				if(result.attrib["Severity"] == "High"):
-					for path in result:
-						description = "Source " + path[0][0].text + " Line " + path[0][1].text + " Object " + path[0][4].text + " "
-						description += "Destination " + path[len(path)-1][0].text + " Line " + path[len(path)-1][1].text + " Object " + path[len(path)-1][4].text + " "
-						description += r'<a href= "' + result.attrib["DeepLink"] + r'">' + result.attrib["DeepLink"] + r'</a>'
-						issue = Issue(result.attrib["FileName"], result.attrib["DeepLink"],description, result.attrib["Severity"], path.attrib["SimilarityId"], str(result.attrib["NodeId"]), 0, vulnerability, result.attrib["AssignToUser"])
-						listOfIssues.append(issue)
-					queryResultCount += 1
+			if (ignoreFP == True and result.attrib["FalsePositive"] != "True") or (ignoreFP == False):
+				if queryResultCount < MAX_CX_RESULTS:
+					#Idenfity "New" issues
+					if(result.attrib["Severity"] == "High"):
+						for path in result:
+							description = "Source " + path[0][0].text + " Line " + path[0][1].text + " Object " + path[0][4].text + " "
+							description += "Destination " + path[len(path)-1][0].text + " Line " + path[len(path)-1][1].text + " Object " + path[len(path)-1][4].text + " "
+							description += r'<a href= "' + result.attrib["DeepLink"] + r'">' + result.attrib["DeepLink"] + r'</a>'
+							issue = Issue(result.attrib["FileName"], result.attrib["DeepLink"],description, result.attrib["Severity"], path.attrib["SimilarityId"], str(result.attrib["NodeId"]), 0, vulnerability, result.attrib["AssignToUser"])
+							listOfIssues.append(issue)
+						queryResultCount += 1
 
 	if len(listOfIssues) > 0:
 		return listOfIssues
